@@ -163,7 +163,7 @@ RUN echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
 
 在 [Docker Hub](https://hub.docker.com/search?q=&type=image&image_filter=official) 上有非常多的高质量的官方镜像，有可以直接拿来使用的服务类的镜像，如 `nginx`、`redis`、`mongo`、`mysql`、`httpd`、`php`、`tomcat` 等；也有一些方便开发、构建、运行各种语言应用的镜像，如 `node`、`openjdk`、`python`、`ruby`、`golang` 等。可以在其中寻找一个最符合我们最终目标的镜像为基础镜像进行定制。
 
-如果没有找到对应服务的镜像，官方镜像中还提供了一些更为基础的操作系统镜像，如 `ubuntu`、`debian`、`centos`、`fedora`、`alpine` 等，这些操作系统的软件库为我们提供了更广阔的扩展空间。
+如果没有找到对应服务的镜像，官方镜像中还提供了一些更为基础的操作系统镜像，如 `ubuntu`、`debian`、`centos`、`fedora`、`alpine` 等，这些操作系统的软件库为我们提供了更广阔的扩展空间。**建议一般使用[alpine](https://www.jianshu.com/p/57e7df199b03)，因为他的体积很小**
 
 除了选择现有镜像为基础镜像外，Docker 还存在一个特殊的镜像，名为 `scratch`。这个镜像是虚拟的概念，并不实际存在，它表示一个空白的镜像。
 
@@ -558,16 +558,7 @@ $ docker run myip
 
 $ docker run myip -i
 HTTP/1.1 200 OK
-Server: nginx/1.8.0
-Date: Tue, 22 Nov 2016 05:12:40 GMT
-Content-Type: text/html; charset=UTF-8
-Vary: Accept-Encoding
-X-Powered-By: PHP/5.6.24-1~dotdeb+7.1
-X-Cache: MISS from cache-2
-X-Cache-Lookup: MISS from cache-2:80
-X-Cache: MISS from proxy-2_6
-Transfer-Encoding: chunked
-Via: 1.1 cache-2:80, 1.1 proxy-2_6:8006
+...
 Connection: keep-alive
 
 当前 IP：61.148.226.66 来自：杭州市 联通
@@ -630,13 +621,13 @@ uid=0(root) gid=0(root) groups=0(root)
 
 这个指令很简单，就是设置环境变量而已，无论是后面的其它指令，如 `RUN`，还是运行时的应用，都可以直接使用这里定义的环境变量。
 
-```docker
+```dockerfile
 ENV VERSION=1.0 DEBUG=on NAME="Happy Feet"
 ```
 
 定义了环境变量，那么在后续的指令中，就可以使用这个环境变量。比如在官方 `node` 镜像 `Dockerfile` 中，就有类似这样的代码：
 
-```docker
+```dockerfile
 ENV NODE_VERSION 7.2.0
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
@@ -668,7 +659,7 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
 
 ARG 指令有生效范围，如果在 `FROM` 指令之前指定，那么只能用于 `FROM` 指令中。
 
-```docker
+```dockerfile
 ARG DOCKER_USERNAME=library
 FROM ${DOCKER_USERNAME}/alpine
 RUN set -x ; echo ${DOCKER_USERNAME}
@@ -676,7 +667,7 @@ RUN set -x ; echo ${DOCKER_USERNAME}
 
 使用上述 Dockerfile 会发现无法输出 `${DOCKER_USERNAME}` 变量的值，要想正常输出，必须在 `FROM` 之后再次指定 `ARG`
 
-```docker
+```dockerfile
 # 只在 FROM 中生效
 ARG DOCKER_USERNAME=library
 FROM ${DOCKER_USERNAME}/alpine
@@ -688,7 +679,7 @@ RUN set -x ; echo ${DOCKER_USERNAME}
 
 对于多阶段构建，尤其要注意这个问题
 
-```docker
+```dockerfile
 # 这个变量在每个 FROM 中都生效
 ARG DOCKER_USERNAME=library
 FROM ${DOCKER_USERNAME}/alpine
@@ -699,7 +690,7 @@ RUN set -x ; echo 2
 
 对于上述 Dockerfile 两个 `FROM` 指令都可以使用 `${DOCKER_USERNAME}`，对于在各个阶段中使用的变量都必须在每个阶段分别指定：
 
-```docker
+```dockerfile
 ARG DOCKER_USERNAME=library
 FROM ${DOCKER_USERNAME}/alpine
 # 在FROM 之后使用变量，必须在每个阶段分别指定
@@ -722,13 +713,13 @@ RUN set -x ; echo ${DOCKER_USERNAME}
 
 之前说过，容器运行时应该尽量保持容器存储层不发生写操作，对于数据库类需要保存动态数据的应用，其数据库文件应该保存于卷(volume)中（这个卷不会随着 Docker 镜像一起发布和共享，所以你本地的数据，别人拿了镜像后是不会有的，顶多会自己创建一个新的空数据卷，但是不会有数据）。为了防止运行时用户忘记将动态文件所保存目录挂载为卷，在 `Dockerfile` 中，可以事先指定某些目录挂载为匿名卷，这样在运行时如果用户不指定挂载，其应用也可以正常运行，不会向容器存储层写入大量数据。
 
-```docker
+```dockerfile
 VOLUME /data
 ```
 
 这里的 `/data` 目录就会在容器运行时自动挂载为匿名卷，任何向 `/data` 中写入的信息都不会记录进容器存储层，从而保证了容器存储层的无状态化。当然，运行容器时可以覆盖这个挂载设置。比如：
 
-```bash
+```dockerfile
 $ docker run -d -v mydata:/data xxxx
 ```
 
@@ -754,7 +745,7 @@ $ docker run -d -v mydata:/data xxxx
 
 之前提到一些初学者常犯的错误是把 `Dockerfile` 等同于 Shell 脚本来书写，这种错误的理解还可能会导致出现下面这样的错误：
 
-```docker
+```dockerfile
 RUN cd /app
 RUN echo "hello" > world.txt
 ```
@@ -765,14 +756,14 @@ RUN echo "hello" > world.txt
 
 因此如果需要改变以后各层的工作目录的位置，那么应该使用 `WORKDIR` 指令。
 
-```docker
+```dockerfile
 WORKDIR /app
 RUN echo "hello" > world.txt
 ```
 
 如果 `WORKDIR` 指令使用的相对路径，那么所切换的路径与之前的 `WORKDIR` 有关：
 
-```docker
+```dockerfile
 WORKDIR /a
 WORKDIR b
 WORKDIR c
@@ -791,7 +782,7 @@ RUN pwd
 
 注意，`USER` 只是帮助切换到指定用户而已，这个用户**必须是事先建立好**的，否则无法切换。
 
-```docker
+```dockerfile
 RUN groupadd -r redis && useradd -r -g redis redis
 USER redis
 RUN [ "redis-server" ]
@@ -799,7 +790,7 @@ RUN [ "redis-server" ]
 
 如果以 `root` 执行的脚本，在执行期间希望改变身份，比如希望以某个已经建立好的用户来运行某个服务进程，不要使用 `su` 或者 `sudo`，这些都需要比较麻烦的配置，而且在 TTY 缺失的环境下经常出错。建议使用 [`gosu`](https://github.com/tianon/gosu)。
 
-```docker
+```dockerfile
 # 建立 redis 用户，并使用 gosu 换另一个用户执行命令
 RUN groupadd -r redis && useradd -r -g redis redis
 # 下载 gosu
@@ -812,13 +803,33 @@ CMD [ "exec", "gosu", "redis", "redis-server" ]
 
 
 
+### LABEL 为镜像添加元数据
+
+`LABEL` 指令用来给镜像以键值对的形式添加一些元数据（metadata）。
+
+```dockerfile
+LABEL <key>=<value> <key>=<value> <key>=<value> ...
+```
+
+还可以用一些标签来申明镜像的作者、文档地址等：
+
+```dockerfile
+LABEL org.opencontainers.image.title="integrated_exporter" \
+      org.opencontainers.image.description="Integrated Exporter" \
+      org.opencontainers.image.url="https://github.com/liushunkkk/integrated_exporter" \
+      org.opencontainers.image.documentation="https://github.com/liushunkkk/integrated_exporter#readme" \
+      org.opencontainers.image.source="https://github.com/liushunkkk/integrated_exporter" \
+      org.opencontainers.image.licenses="Apache-2.0 license" \
+      maintainer="liushun <liushun0311@zju.edu.cn>"
+```
+
+
+
 ### 其他指令
 
 [HEALTHCHECK 健康检查](https://docker-practice.github.io/zh-cn/image/dockerfile/healthcheck.html)
 
 [ONBUILD 为他人做嫁衣裳](https://docker-practice.github.io/zh-cn/image/dockerfile/onbuild.html)
-
-[LABEL](https://docker-practice.github.io/zh-cn/image/dockerfile/label.html)
 
 [SHELL](https://docker-practice.github.io/zh-cn/image/dockerfile/shell.html)
 
@@ -828,3 +839,143 @@ CMD [ "exec", "gosu", "redis", "redis-server" ]
 
 用到了再说了，看的脑壳痛，[菜](https://docker-practice.github.io/zh-cn/image/multistage-builds/)
 
+
+
+### 构建多种系统架构支持的 Docker 镜像 
+
+docker manifest 命令感觉很可以，插个眼。还有一个方式就是docker buildx。
+
+
+
+## Docker Buildx
+
+Docker Buildx 是一个 docker CLI 插件，其扩展了 docker 命令，支持Moby BuildKit提供的功能。提供了与 docker build 相同的用户体验，并增加了许多新功能。
+
+**BuildKit** 是下一代的镜像构建组件，他新增了几个新的 `Dockerfile` 指令来加快镜像构建。没用过。。。
+
+[Buildx](https://docs.docker.com/reference/cli/docker/buildx/) 使用 BuildKit 引擎进行构建，支持许多新的功能。可以直接使用 `docker buildx build` 命令构建镜像。
+
+```bash
+$ docker buildx build .
+[+] Building 8.4s (23/32)
+ => ...
+```
+
+### 构建多种系统架构支持的 Docker 镜像
+
+
+
+**新建 `builder` 实例**
+
+Docker for Linux 不支持构建 `arm` 架构镜像，可以运行一个新的容器让其支持该特性，Docker 桌面版无需进行此项设置。
+
+```bash
+$ docker run --rm --privileged tonistiigi/binfmt:latest --install all
+# 这条命令通常用于设置支持多架构的容器环境。在 Docker 中，如果您想要构建或运行不同架构（例如 arm64 或 s390x）的镜像，您需要先启用对这些架构的支持。tonistiigi/binfmt 镜像通过在宿主机上安装 binfmt_misc 来实现这一功能，使得宿主机能够模拟其他架构的二进制文件，从而在不同平台之间进行容器的构建和运行。
+```
+
+由于 Docker 默认的 `builder` 实例不支持同时指定多个 `--platform`，必须首先创建一个新的 `builder` 实例。同时由于国内拉取镜像较缓慢，可以使用配置了镜像加速地址的 `dockerpracticesig/buildkit:master` 镜像替换官方镜像。
+
+```bash
+# 适用于国内环境
+$ docker buildx create --use --name=mybuilder-cn --driver docker-container --driver-opt image=dockerpracticesig/buildkit:master
+
+# 适用于腾讯云环境(腾讯云主机、coding.net 持续集成)
+$ docker buildx create --use --name=mybuilder-cn --driver docker-container --driver-opt image=dockerpracticesig/buildkit:master-tencent
+
+# $ docker buildx create --name mybuilder --driver docker-container
+
+$ docker buildx use mybuilder
+```
+
+
+
+在之前的版本中构建多种系统架构支持的 Docker 镜像，要想使用统一的名字必须使用 `$ docker manifest` 命令。
+
+在 Docker 19.03+ 版本中可以使用 `$ docker buildx build` 命令使用 `BuildKit` 构建镜像。该命令支持 `--platform` 参数可以同时构建支持多种系统架构的 Docker 镜像，大大简化了构建步骤。
+
+**新建 Dockerfile 文件**
+
+```docker
+FROM --platform=$TARGETPLATFORM alpine
+
+RUN uname -a > /os.txt
+
+CMD cat /os.txt
+```
+
+使用 `$ docker buildx build` 命令构建镜像， `myusername` 为自己的 Docker Hub 用户名。`--push` 参数表示将构建好的镜像推送到 Docker 仓库。下面是我真实使用buildx发布的一个镜像，可以看到buildx底层其实还是使用manifests来完成多系统架构支持的。可以看到他是支持linux/amd64和linux/arm64的，
+
+```bash
+$ docker buildx build --platform linux/arm64,linux/amd64 -t myusername/hello . --push
+
+# 查看镜像信息
+$ docker buildx imagetools inspect ghcr.io/liushunkkk/integrated_exporter                              
+Name:      ghcr.io/liushunkkk/integrated_exporter:latest
+MediaType: application/vnd.oci.image.index.v1+json
+Digest:    sha256:786622636f1d4828edcc0c12971f84c71c701185ef46b73274863575192fcb68
+           
+Manifests: 
+  Name:        ghcr.io/liushunkkk/integrated_exporter:latest@sha256:66347ecfbd2aa08c9e2a79fce3a239fc61e4bb2508a6d6cf871a1da87080cf20
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    linux/amd64
+               
+  Name:        ghcr.io/liushunkkk/integrated_exporter:latest@sha256:2dab86ff855acad6b054b2845d94b311f31be6874d8fa7bd6718f01fdcad942f
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    linux/arm64
+               
+  Name:        ghcr.io/liushunkkk/integrated_exporter:latest@sha256:2b26112ed9b34a5a034831adbf516bd8c8d1d623dce1efd03809b08ec6000837
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    unknown/unknown
+  Annotations: 
+    vnd.docker.reference.digest: sha256:66347ecfbd2aa08c9e2a79fce3a239fc61e4bb2508a6d6cf871a1da87080cf20
+    vnd.docker.reference.type:   attestation-manifest
+               
+  Name:        ghcr.io/liushunkkk/integrated_exporter:latest@sha256:fe818ac74179ff0229e9c121f23c09ce916e2a6f5c0ee7f2f73e96d06fd4c7f3
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    unknown/unknown
+  Annotations: 
+    vnd.docker.reference.digest: sha256:2dab86ff855acad6b054b2845d94b311f31be6874d8fa7bd6718f01fdcad942f
+    vnd.docker.reference.type:   attestation-manifest
+```
+
+在不同架构运行该镜像，他会根据环境自动拉去对应的镜像文件。
+
+
+
+### 架构相关变量
+
+`Dockerfile` 支持如下架构相关的变量
+
+- `TARGETPLATFORM`：构建镜像的目标平台，例如 `linux/amd64`, `linux/arm/v7`, `windows/amd64`。
+- `TARGETOS`：`TARGETPLATFORM` 的 OS 类型，例如 `linux`, `windows`
+- `TARGETARCH`：`TARGETPLATFORM` 的架构类型，例如 `amd64`, `arm`
+- `TARGETVARIANT`：`TARGETPLATFORM` 的变种，该变量可能为空，例如 `v7`
+- `BUILDPLATFORM`：构建镜像主机平台，例如 `linux/amd64`
+- `BUILDOS`：`BUILDPLATFORM` 的 OS 类型，例如 `linux`
+- `BUILDARCH`：`BUILDPLATFORM` 的架构类型，例如 `amd64`
+- `BUILDVARIANT`：`BUILDPLATFORM` 的变种，该变量可能为空，例如 `v7`
+
+**使用举例**
+
+例如要构建支持 `linux/arm/v7` 和 `linux/amd64` 两种架构的镜像。假设已经生成了两个平台对应的二进制文件：
+
+- `bin/dist-linux-arm`
+- `bin/dist-linux-amd64`
+
+那么 `Dockerfile` 可以这样书写：
+
+```docker
+FROM scratch
+
+# 使用变量必须申明
+ARG TARGETOS
+
+ARG TARGETARCH
+
+COPY bin/dist-${TARGETOS}-${TARGETARCH} /dist
+
+ENTRYPOINT ["dist"]
+```
+
+然后在docker buildx的时候指定`--platform`为`linux/arm`和`linux/amd64`。

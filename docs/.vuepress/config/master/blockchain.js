@@ -64,6 +64,7 @@ export const BlockChainSideBar = {
       text: 'Golang',
       children: [
         '/master/gointern/golang/README.md',
+        '/master/gointern/golang/base.md',
         '/master/gointern/golang/goweb.md',
         '/master/gointern/golang/protobuf.md',
         '/master/gointern/golang/rpc.md',
