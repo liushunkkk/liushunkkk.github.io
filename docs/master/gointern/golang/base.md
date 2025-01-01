@@ -36,7 +36,7 @@ type Context interface {
 
 可以为context创建根节点和派生节点，为树形结构，当根节点被 `cancel()` 或超时终止时，它的所有派生节点也会被终止，根节点的数据也会被所有派生节点共享。
 
-![context 结构](./base.assets/context.png)
+<img src="./base.assets/context.png" alt="context 结构" style="zoom:67%;" />
 
 创建根节点
 
@@ -221,15 +221,29 @@ func testPanic(i int) {
 //         panic: panic in defer
 ```
 
+**error**
+
+判断error需要使用`errors.Is`或`errors.As`，而不是用==判断
+
+```go
+var ErrCouldNotOpen = errors.New("error")
+if errors.Is(err, ErrCouldNotOpen) {
+  // handle the error
+} else {
+  panic("unknown error")
+}
+```
+
 
 
 执行流程
 
 - 编译器将panic转换为runtime包中的gopanic函数并调用
 - 将goroutine的defer链表逆序执行（defer的执行可以类比于栈，按照先进后出的顺序执行）
-- 如果defer中没有recover，则执行defer中的代码
-- 如果 `defer` 中有 `recover`，则会调用 `runtime.gorecover`, 将 `panic` 中的 `recovered` 置为 `true`，然后从 `runtime._defer` 中取出程序计数器 `pc` 和栈指针 `sp`，并执行 `runtime.recovery` 恢复程序，最后调用 `runtime.deferproc` 返回 `1`，表示 `recover` 成功。
-- `panic` 的 `deferreturn` 字段置为 `true`，表示 `defer` 已经执行完毕
+  - 如果defer中没有recover，则执行defer中的代码
+  - 如果 `defer` 中有 `recover`，则会调用 `runtime.gorecover`, 将 `panic` 中的 `recovered` 置为 `true`，然后从 `runtime._defer` 中取出程序计数器 `pc` 和栈指针 `sp`，并执行 `runtime.recovery` 恢复程序，最后调用 `runtime.deferproc` 返回 `1`，表示 `recover` 成功。
+  - `panic` 的 `deferreturn` 字段置为 `true`，表示 `defer` 已经执行完毕
+
 - 如果所有 `defer` 中都没有 `recover()`， 则程序会执行 `runtime.fatalpanic` 终止运行
 
 不可以捕获的异常
@@ -252,7 +266,7 @@ func testPanic(i int) {
 
 ## GMP调度器
 
-![os-runtime-program](./base.assets/scheduler.png)
+<img src="./base.assets/scheduler.png" alt="os-runtime-program" style="zoom:50%;" />
 
 通过上图可以看到，操作系统内核和写的逻辑代码之间通过runtime进行交互，runtime会调用操作系统的系统调用，操作系统来调用硬件资源，以此来运行程序。
 
@@ -266,7 +280,7 @@ func testPanic(i int) {
 | M (Machine)   | 表示一个执行线程（真正的内核线程），负责将 Goroutine 映射到操作系统的线程上。每个 M 都有自己的调用栈和寄存器状态 |
 | P (Processor) | 表示一个逻辑处理器，维护一个处于可运行状态的 Goroutine 队列，每个 M 都和一个 P 相关联 |
 
-![screenshot2024-12-24 11.18.47](./base.assets/gmp.png)
+<img src="./base.assets/gmp.png" alt="screenshot2024-12-24 11.18.47" style="zoom: 33%;" />
 
 - **全局队列RRQ**(global runnable queue)：存放所有正在等待运行的`G`
 - **本地队列LRQ**(local runnable queue)：每个`P`都有一个本地队列，用于存放当前 `P` 等待和正在运行的 `G`，每个 `P` 的本地队列中最多存放 `256` 个 `G` 。创建 `G` 时，会优先放入本地队列，如果本地队列满了， 则会将队列中一半的 `G` 移动到全局队列中。
@@ -285,7 +299,7 @@ func testPanic(i int) {
 - 并行：通过 `GOMAXPROCS` 配置 `P` 的数量，从而实现并行执行，`P` 的数量决定了并行度，`P` 的数量等于 CPU 核数时，可以实现最大并行度。
 - 全局队列 ：当本地队列中没有可运行的 `G`， `M` 会先去全局队列尝试获取 `G`， 若全局队列中没有待运行的 `G` 则会尝试去其他 `P` 的本地队列中偷取 `G`
 
-![在这里插入图片描述](./base.assets/5a293b01f1ae37cf93a18957a39457ac.png)
+<img src="./base.assets/5a293b01f1ae37cf93a18957a39457ac.png" alt="在这里插入图片描述" style="zoom:50%;" />
 
 流程：
 
@@ -299,7 +313,7 @@ func testPanic(i int) {
 
 生命周期：
 
-<img src="./base.assets/livetime.png" alt="dd" style="zoom:67%;" />
+<img src="./base.assets/livetime.png" alt="dd" style="zoom: 67%;" />
 
 特殊的 M0 和 G0
 
@@ -378,7 +392,7 @@ Go中采用最简单的“标记-清除”，“标记有用的对象，清除�
 - 执行栈：Go语言中协程是分配在堆上，每个协程都含有自己的执行栈。
 - 寄存器：寄存器的值可能表示一个指针，这些指针可能指向另一块内存空间。
 
-![screenshot2024-12-24 15.00.47](./base.assets/rootset.png)
+<img src="./base.assets/rootset.png" alt="screenshot2024-12-24 15.00.47" style="zoom: 33%;" />
 
 #### 三色标记算法
 
@@ -398,7 +412,7 @@ Go中采用最简单的“标记-清除”，“标记有用的对象，清除�
 - 重复步骤2和3，直到没有灰色对象
 - 清除所有白色对象
 
-![三色标记法过程](./base.assets/three-color-gc.png)
+<img src="./base.assets/three-color-gc.png" alt="三色标记法过程" style="zoom: 20%;" />
 
 三色标记正确的前提，需要达成以下一种三色不变性：
 
@@ -406,7 +420,7 @@ Go中采用最简单的“标记-清除”，“标记有用的对象，清除�
 
 弱三色不变性：在标记阶段中，黑色对象指向的白色对象（G）必须包含一条灰色对象经过一个或多个白色对象后到达白色对象（G）的路径
 
-![弱三色不变性](./base.assets/three-color-gc-error-prevent.png)
+<img src="./base.assets/three-color-gc-error-prevent.png" alt="弱三色不变性" style="zoom:20%;" />
 
 
 
@@ -422,7 +436,7 @@ Go中采用最简单的“标记-清除”，“标记有用的对象，清除�
 
 当一个对象 `A` 添加了对另一个对象 `B` 的引用时，会在 `A` 的引用列表中插入一个 `B` 的引用，并且将 `B` 标记为灰色。
 
-![插入屏障](./base.assets/three-color-write-prevent.png)
+<img src="./base.assets/three-color-write-prevent.png" alt="插入屏障" style="zoom:17%;" />
 
 注意，插入屏障只会发生在堆中，所以对于栈中的D不会标记为灰色，需要再一次STW重新扫描，才能将D标记为黑色。
 
@@ -430,7 +444,7 @@ Go中采用最简单的“标记-清除”，“标记有用的对象，清除�
 
 当一个对象 `A` 删除了对另一个对象 `B` 的引用时，会在 `A` 的引用列表中删除一个 `B` 的引用，如果 `B` 是白色的，则将 `B` 标记为灰色。
 
-![删除屏障](./base.assets/three-color-delete-barrier.png)
+<img src="./base.assets/three-color-delete-barrier.png" alt="删除屏障" style="zoom:20%;" />
 
 插入屏障和删除屏障有以下缺点：
 
@@ -537,7 +551,7 @@ rw.Unlock()
 - 互斥锁是一种重量级锁，它会涉及到内核态的上下文切换，性能消耗较大，而原子操作是一种轻量级锁，它是在用户态完成的，性能更高。
 - 互斥锁有操作系统的调度器实现， 而原子操作则是有硬件提供的原子指令实现，无需加锁而实现并发安全。
 
-![screenshot2024-12-24 15.55.29](./base.assets/caozuohanshu.png)
+<img src="./base.assets/caozuohanshu.png" alt="screenshot2024-12-24 15.55.29" style="zoom:50%;" />
 
 使用示例
 
@@ -695,3 +709,75 @@ func CalculationFactory(t string) func(int, int) int {
 ```
 
 可以传入 `ADD` 获取加法函数，`DIV` 获取除法函数。
+
+
+
+
+
+## byte&rune
+
+`byte` 和 `rune` 都是用于表示字符的类型，但它们之间有一些区别：
+
+类型不同：
+
+- `byte` ：字节，是 `uint8` 的别名类型
+- `rune` ：字符，是 `int32` 的别名类型
+
+存储的字符不同：
+
+```go
+//byte 用于表示 ASCII 码字符，只能存储 0-255 范围内的字符。
+var a byte = 'Y'  // ASCII 码字符
+
+//rune 用于表示 Unicode 字符，可以存储任意 Unicode 字符。
+var b rune = '酥'  // Unicode 字符
+```
+
+占用的字节大小不同：byte 占用1个字节，rune 占用4个字节
+
+```go
+import "unsafe"
+var a byte = 'Y'
+var b rune = '酥'
+fmt.Printf("a 占用 %d 个字节数\nb 占用 %d 个字节数", unsafe.Sizeof(a), unsafe.Sizeof(b))
+// 输出: a 占用 1 个字节数 b 占用 4 个字节数
+```
+
+
+
+
+
+## new&make
+
+`new` 用于给任意的类型分配内存地址，并返回该类型的指针，且初始化值为**零值**。注意new一个引用类型，他指针指向是nil。
+
+> new一般用于生成一个值类型的指针变量
+
+```go
+func main() {
+	s := new(string)
+	n := new(int)
+
+	fmt.Println(s) // 0xc00008a030
+	fmt.Println(*s) // ""
+
+	fmt.Println(n) // 0xc00000a0d8
+	fmt.Println(*n) // 0
+  
+  c := new(map[int]int)
+	*c = make(map[int]int, 10)
+	fmt.Println(*c) // 还是需要再一次make初始化的
+}
+```
+
+`make` 主要用于引用数据类型 `slices` `map` `channel` 的初始化
+
+```go
+func main() {
+	m := make(map[string]int, 10)
+	fmt.Println(m) // map[]
+}
+```
+
+
+

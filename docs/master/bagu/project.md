@@ -64,6 +64,34 @@
 
 最后为了防止有人恶意订阅，我们还限制IP的连接数，一个IP只能连接5个，后面又加了token限制，只能买了订阅计划的人才能订阅。
 
+自己实现一个订阅发布：
+
+```go
+type SSEServer struct {
+	server       *ms.Server
+	clientsMtx   sync.Mutex
+	clients      map[string]int
+	consumers    map[string]*Consumer
+	IPLimitCount int
+}
+
+type Consumer struct {
+	ID      string
+	Channel chan *define.SseBundleData
+	Exit    atomic.Bool
+}
+```
+
+使用一个map来存储所有的订阅者，每次发布消息的时候，遍历map，拿出所有的订阅者，然后遍历推送。
+
+一个消费者其实就是就是一个channel加上他的ID，同时还有一个Exit信号，是一个原子的bool类型。
+
+这个信号在推送消息的时候，如果不能往该消费者的通道写消息（通道的消息堆满了，说明消费者网络拥塞，卡住了），则将该信号量置为true，在消费的for循环内会读取这个变量，一旦这个变量变为true，就会直接退出，从而关闭这个消费者的sse通道。
+
+
+
+其实有两个通道：一个是交易消息的通道，一个是消费者自己的通道
+
 
 
 ### 缓存问题
@@ -75,6 +103,11 @@
 所以我当时就用了一个lru缓存，一旦交易通过后端保存成功后，我就会讲该交易的id进行缓存，这样下次再发送之前，会先校验缓存。
 
 至于失败重传，处理还挺简单的，我当时的做法是只有保存成功了，我才保存到缓存，如果后端那边接口返回失败，我就不会加缓存，下次再发的时候自然就查不到了。
+
+```go
+bundleCache *lru.Cache[string, struct{}]
+s.bundleCache.Add(sr.BundleHash, struct{}{})
+```
 
 
 
