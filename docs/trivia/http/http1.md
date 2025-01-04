@@ -6,7 +6,7 @@
 
 Web是一种基于超文本和HTTP的、全球性的、动态交互的、跨平台的**分布式图形信息系统**。是建立在internet上的一种网络服务，为浏览者在internet上查找和浏览信息提供了图形化的、易于访问的直观界面，其中的文档及超级链接将internet上的信息节点组织成一个互为关联的网状结构。
 
-![screenshot2024-11-27 14.59.49](./http1.assets/qianshijinsheng.png)
+<img src="./http1.assets/qianshijinsheng.png" alt="screenshot2024-11-27 14.59.49" style="zoom:67%;" />
 
 
 
@@ -16,25 +16,16 @@ Web是一种基于超文本和HTTP的、全球性的、动态交互的、跨平�
 
 HTTP协议是构建在TCP/IP协议之上的，是TCP/IP协议族的一个子集
 
-TCP/IP协议族是由一个四层协议组成的系统，这四层分别为：应用层、传输层
+TCP/IP协议族是由一个四层协议组成的系统，这四层分别为：应用层、传输层、网络层和数据链路层。
 
-网络层和数据链路层。
+- 应用层：应用层一般是编写的应用程序，决定了向用户提供的应用服务。应用层可以通过系统调用与传输层进行通信，如FTP、DNS、HTTP等。
 
-应用层：
+- 传输层：传输层通过系统调用向应用层提供处于网络连接中的两台计算机之间的数据传输功能，包括TCP和UDP。
 
-应用层一般是编写的应用程序，决定了向用户提供的应用服务。应用层可以通过系统调用与传输层进行通信，如FTP、DNS、HTTP等。
+- 网络层：网络层是用来处理在网络上流动的数据包，数据包是网络传输的最小数据单位。该层规定了通过怎样的路径（传输路线）到达对方计算机，并把数据包传输给对方。
 
-传输层：
+- 链路层：链路层用来处理连接网络的硬件部分，包括控制操作系统、硬件设备驱动、NIC网络适配器以及光纤等物理可见部分，硬件上的范畴均在链路层的作用范围之内。
 
-传输层通过系统调用向应用层提供处于网络连接中的两台计算机之间的数据传输功能，包括TCP和UDP。
-
-网络层：
-
-网络层是用来处理在网络上流动的数据包，数据包时网络传输的最小数据单位。该层规定了通过怎样的路径（传输路线）到达对方计算机，并把数据包传输给对方。
-
-链路层：
-
-链路层用来处理连接网络的硬件部分，包括控制操作系统、硬件设备驱动、NIC网络适配器以及光纤等物理可见部分，硬件上的范畴均在链路层的作用范围之内。
 
 ### 封装过程
 
@@ -70,13 +61,13 @@ TCP/IP协议族是由一个四层协议组成的系统，这四层分别为：�
 
 可以是用`dig`来查询域名解析过程，可能查询别的域名不止下面展示的这些信息。有些需要认证，就会有其他信息。
 
-![screenshot2024-11-27 15.48.54](./http1.assets/dig.png)
+<img src="./http1.assets/dig.png" alt="screenshot2024-11-27 15.48.54" style="zoom: 50%;" />
 
 第一段是查询参数和统计。
 
-第二段是查询内容：表明查询域名`baidu.com`的`A`记录，`A`是Address的缩写。
+第二段是查询内容：表明查询域名`duilianyun.com`的`A`记录，`A`是Address的缩写。
 
-第三段是DNS服务器的答复：结果显示`baidu.com`由一个A记录，即一个IP地址，`1`是TTL值（Time to live），表示缓存时间。
+第三段是DNS服务器的答复：结果显示`duilianyun.com`由一个A记录，即一个IP地址，`1`是TTL值（Time to live），表示缓存时间。
 
 第四段是DNS服务器的一些传输信息：显示本机的DNS服务器是`198.18.0.2`，查询端口是53，这是DNS服务器的默认端口，以及回应长度是73字节。
 
@@ -93,7 +84,7 @@ dig +short google.com
 
 本机一定要知道DNS服务器的IP地址，否则上不了网。DNS服务器的IP地址可能是动态的，每次上网时由网关分配，这叫做DHCP机制；也有可能是事先指定的固定地址，Linux系统中DNS服务器的IP地址保存在`/etc/resolv.conf`文件中。
 
-![screenshot2024-11-27 15.58.49](./http1.assets/dnsfuwuqi.png)
+<img src="./http1.assets/dnsfuwuqi.png" alt="screenshot2024-11-27 15.58.49" style="zoom: 50%;" />
 
 上图中的DNS服务器是`198.18.0.2`，这是一个内网地址。
 
@@ -103,7 +94,7 @@ dig +short google.com
 
 dig默认是请求自己的DNS服务器，也可以指定向哪个DNS服务器查询。
 
-![screenshot2024-11-27 16.01.41](./http1.assets/dis8888.png)
+<img src="./http1.assets/dis8888.png" alt="screenshot2024-11-27 16.01.41" style="zoom:50%;" />
 
 可以看到通过谷歌的DNS服务器，查到的百度的ip有两个，还和本地的都不一样。
 
@@ -151,11 +142,11 @@ DNS服务器根据域名的层级，进行分级查询。
 
 **递归查询**
 
-![screenshot2024-11-27 17.57.18](./http1.assets/diguichaxun.png)
+<img src="./http1.assets/diguichaxun.png" alt="screenshot2024-11-27 17.57.18" style="zoom: 33%;" />
 
 **迭代查询**
 
-![screenshot2024-11-27 17.58.01](./http1.assets/diedaichaxun.png)
+<img src="./http1.assets/diedaichaxun.png" alt="screenshot2024-11-27 17.58.01" style="zoom:33%;" />
 
 递归查询: 如果主机所询问的本地域名服务器不知道被查询域名的 IP 地址，那么本地域名服务器就以 DNS 客户端的身份，向其他根域名服务器继续发出查询请求报文，即替主机继续查询，而不是让主机自己进行下一步查询。
 
@@ -167,7 +158,7 @@ DNS服务器根据域名的层级，进行分级查询。
 
 dig命令的`+trace`参数可以显示DNS的整个分级查询过程
 
-![screenshot2024-11-27 16.36.02](./http1.assets/all.png)
+<img src="./http1.assets/all.png" alt="screenshot2024-11-27 16.36.02" style="zoom:50%;" />
 
 第一段列出根域名`.`的所有NS记录，即所有根域名服务器。
 
@@ -185,7 +176,7 @@ dig命令的`+trace`参数可以显示DNS的整个分级查询过程
 
 然后DNS服务器向上面这四台NS服务器查询baidu.com其实也是`www.baidu.com`的主机名
 
-![screenshot2024-11-27 16.50.21](./http1.assets/arch5.png)
+<img src="./http1.assets/arch5.png" alt="screenshot2024-11-27 16.50.21" style="zoom:50%;" />
 
 结果显示，baidu.com有两条A记录，即这两个IP地址都能访问到百度的网站，并且还显示，最先返回的结果的NS服务器是`ns1.baidu.com`，IP地址是`198.18.1.30`。
 
@@ -214,7 +205,7 @@ $ dig ns baidu.com
 >
 > （2） `NS`：域名服务器记录（Name Server），返回保存下一级域名信息的服务器地址。该记录只能设置为域名，不能设置为IP地址。
 >
-> （3）`MX`：邮件记录（Mail eXchange），返回接收电子邮件的服务器地址。
+> （3）`MX`：邮件记录（Mail Exchange），返回接收电子邮件的服务器地址。
 >
 > （4）`CNAME`：规范名称记录（Canonical Name），返回另一个域名，即当前查询的域名是另一个域名的跳转，详见下文。
 >
@@ -329,23 +320,23 @@ HTTP 是无状态的：在同一个连接中，两个执行成功的请求之间
 
 #### 请求报文
 
-![screenshot2024-11-28 15.52.18](./http1.assets/baowen.png)
+<img src="./http1.assets/baowen.png" alt="screenshot2024-11-28 15.52.18" style="zoom:67%;" />
 
 报文头：
 
-通用报文头
+**通用报文头**
 
 
 
-![screenshot2024-11-28 15.54.07](./http1.assets/tongyongbaowentou.png)
+<img src="./http1.assets/tongyongbaowentou.png" alt="screenshot2024-11-28 15.54.07" style="zoom:67%;" />
 
 Connection：keep-alive：当一个网页打开完成后，客户端和服务器之间用于传输HTTP数据的TCP连接不会关闭，如果客户端再次访问这个服务器的网页，会继续使用这一条已经建立的连接。
 
-Connect：close：代表一个request完成后，客户端和服务器之间用于传输HTTP数据的TCP连接会关闭，当客户端再次发送request，需要重新建立TCP连接。
+Connection：close：代表一个request完成后，客户端和服务器之间用于传输HTTP数据的TCP连接会关闭，当客户端再次发送request，需要重新建立TCP连接。
 
-请求报文头
+**请求报文头**
 
-![screenshot2024-11-28 15.54.26](./http1.assets/qingqiubaowentou.png)
+<img src="./http1.assets/qingqiubaowentou.png" alt="screenshot2024-11-28 15.54.26" style="zoom:67%;" />
 
 这是针对浏览器的声明，如可接受的媒体类型，语言，字符集等等
 
@@ -357,47 +348,47 @@ User-Agent：客户端使用的操作系统和浏览器的名称和版本
 
 
 
-响应报文头
+**响应报文头**
 
-![screenshot2024-11-28 15.55.22](./http1.assets/xiangyingbaowentou.png)
+<img src="./http1.assets/xiangyingbaowentou.png" alt="screenshot2024-11-28 15.55.22" style="zoom: 67%;" />
 
-实体报文头
+**实体报文头**
 
-![screenshot2024-11-28 15.56.05](./http1.assets/shitibaowentou.png)
+<img src="./http1.assets/shitibaowentou.png" alt="screenshot2024-11-28 15.56.05" style="zoom:67%;" />
 
 
 
 #### 响应报文
 
-![screenshot2024-11-28 16.06.54](./http1.assets/xiangyingbaowen.png)
+<img src="./http1.assets/xiangyingbaowen.png" alt="screenshot2024-11-28 16.06.54" style="zoom: 50%;" />
 
 ### 状态码
 
-![screenshot2024-11-28 16.25.48](./http1.assets/zhuangtaima.png)
+<img src="./http1.assets/zhuangtaima.png" alt="screenshot2024-11-28 16.25.48" style="zoom: 50%;" />
 
-200：请求成功，请求所希望的响应头或数据体将随此响应返回
+**200：请求成功，请求所希望的响应头或数据体将随此响应返回**
 
 202：Accepted，已接受请求，但未处理完成
 
 206：partial content部分内容，服务器成功处理了部分get请求
 
-301：moved permanently，永久移动，请求的资源已被永久的移动到新URI，返回信息会包括新的URI，浏览器会自动定向到新URI，今后任何新的请求都会使用新的URI代替。
+**301：moved permanently，永久移动**，请求的资源已被永久的移动到新URI，返回信息会包括新的URI，浏览器会自动定向到新URI，今后任何新的请求都会使用新的URI代替。
 
 302：found，临时移动，与301类型，但是资源只是临时被移动，客户端应继续使用原有URI
 
-304：not modified，服务器指代当前资源没有修改，使用缓存
+**304：not modified，服务器指代当前资源没有修改，使用缓存**
 
-400：bad request，客户端请求的语法错误，服务器无法理解
+**400：bad request，客户端请求的语法错误，服务器无法理解**
 
-401：unauthorized，请求要求用户的身份认证
+**401：unauthorized，请求要求用户的身份认证**
 
-403：forbidden，服务器拒绝执行客户端的请求
+**403：forbidden，服务器拒绝执行客户端的请求**
 
-404：not found，服务器无法根据客户端的请求找到资源
+**404：not found，服务器无法根据客户端的请求找到资源**
 
-500：internal server error，服务器内部错误，无法完成请求
+**500：internal server error，服务器内部错误，无法完成请求**
 
-502：bad gateway，从充当网关或代理的远端服务器收到一个无效的请求。
+**502：bad gateway，从充当网关或代理的远端服务器收到一个无效的请求。**
 
 
 
@@ -419,13 +410,13 @@ Session是另一种记录客户状态的机制，保存在服务器上，客户�
 
 客户端再次访问时，只需要从该Session中查找该客户的状态即可。
 
-![screenshot2024-11-28 18.05.58](./http1.assets/session.png)
+<img src="./http1.assets/session.png" alt="screenshot2024-11-28 18.05.58" style="zoom:67%;" />
 
 
 
 ### 字符集与编码
 
-<img src="./http1.assets/binamaguifan.png" alt="screenshot2024-11-28 18.29.42" style="zoom:50%;" />
+<img src="./http1.assets/binamaguifan.png" alt="screenshot2024-11-28 18.29.42" style="zoom: 50%;" />
 
 常见的编码规范有ASCII码，GBK（中文），Unicode（所有字符），一种编码规范可能有多种编码方式，比如unicode编码规范有utf8，utf16等编码方式。
 
@@ -445,13 +436,13 @@ HTTP常见认证方式：BASIC基本认证，DIGEST摘要认证，SSL客户端�
 
 **BASIC认证**
 
-![screenshot2024-11-28 18.47.19](./http1.assets/ndisadas.png)
+<img src="./http1.assets/ndisadas.png" alt="screenshot2024-11-28 18.47.19" style="zoom:67%;" />
 
 **DIGEST认证**
 
 DIGEST认证同样使用质询/响应的方式，但不会像BASIC认证那样直接发送明文密码。
 
-![screenshot2024-11-28 18.51.40](./http1.assets/digest.png)
+<img src="./http1.assets/digest.png" alt="screenshot2024-11-28 18.51.40" style="zoom:67%;" />
 
 **SSL客户端认证**
 
@@ -465,7 +456,7 @@ SSL客户端认证是借由HTTPS的客户端证书完成认证的方式。凭借
 
 ### 长短连接
 
-HTTP协议是基于请求/响应模式的，因此只要服务端给了响应，本次HTTP请求就结束了。HTTP的长连接和短连接本质上是TCP的长连接和短连接。
+HTTP协议是基于请求/响应模式的，因此只要服务端给了响应，本次HTTP请求就结束了。**HTTP的长连接和短连接本质上是TCP的长连接和短连接。**
 
 HTTP/1.0中，默认使用的是短连接，浏览器和服务器每进行一次HTTP操作，就建立一次连接，结束就中断。
 
@@ -501,7 +492,7 @@ HTTP/1.1起，默认使用长连接，用以保持连接特性，就是请求头
 
 （代理服务器连接的是相同协议的两端、网关连接的是不同协议的两端）
 
-![screenshot2024-11-29 09.57.14](./http1.assets/gateway.png)
+<img src="./http1.assets/gateway.png" alt="screenshot2024-11-29 09.57.14" style="zoom:67%;" />
 
 Web网关：
 
@@ -540,7 +531,7 @@ Cache-Control：请求/响应头，缓存控制字段
 - no-store：所有内容都不缓存
 - no-cache：缓存，但是浏览器使用缓存前，都会请求服务器判断缓存资源是否是最新
 - max-age=x秒：请求缓存后的x秒内不再发起请求
-- s-maxage=x秒：代理服务器请求源站缓存后的x秒内不再发起请求，支队CDN缓存有效
+- s-maxage=x秒：代理服务器请求源站缓存后的x秒内不再发起请求，只对CDN缓存有效
 - public：客户端和代理服务器CDN都可缓存
 - private：只有客户端可以缓存
 
@@ -602,7 +593,7 @@ CDN是构建在网络之上的内容分发网络，依靠部署在各地的边�
 
 **浏览器操作对缓存的影响**
 
-![screenshot2024-11-29 17.12.11](./http1.assets/liulanqicaozuo.png)
+<img src="./http1.assets/liulanqicaozuo.png" alt="screenshot2024-11-29 17.12.11" style="zoom: 50%;" />
 
 mac上强制刷新是`command + shift + R`或者按住`shift`点击网页刷新。
 
@@ -652,7 +643,7 @@ Content-Range:
 
 下载一个1024k的文件，已经下载了512k，网络中断恢复后，客户端请求续传，需要在http请求头中申明本次续传片段：`Range: bytes=512000-`
 
-服务端收到断点续传请求后，从512k位置开始传输文件，并在HTTP头中增加：`Content-Range: bytes 521000-/1024000`，并且服务器返回的状态码是`206`，而不是`200`。
+服务端收到断点续传请求后，从512k位置开始传输文件，并在HTTP头中增加：`Content-Range: bytes 512000-/1024000`，并且服务器返回的状态码是`206`，而不是`200`。
 
 
 
@@ -666,7 +657,7 @@ HTTPS 其实是一个“非常简单”的协议，RFC 文档很小，只有短�
 
 SSL/TLS是位于TCP/IP 7层协议中的会话层，用于认证用户和服务器，加解密数据以及维护数据的完整性，确保数据在传输过程中不会被修改。
 
-![img](./http1.assets/ssl:tsl.png)
+<img src="./http1.assets/ssl:tsl.png" alt="img" style="zoom: 50%;" />
 
 SSL 有 v2 和 v3 两个版本，而 v1 因为有严重的缺陷从未公开过。1999 年改名为 TLS（传输层安全，Transport Layer Security），正式标准化，版本号从 1.0 重新算起，所以 TLS1.0 实际上就是 SSLv3.1。
 
@@ -739,7 +730,7 @@ TLS把对称加密和非对称加密结合起来，两者互相取长补短，�
 
 不过摘要算法不具有机密性，如果明文传输，那么黑客可以修改消息后把摘要也一起改了，网站还是鉴别不出完整性。所以，真正的完整性必须要建立在机密性之上，在混合加密系统里用会话密钥**加密消息和摘要**，这样黑客无法得知明文，也就没有办法动手脚了。这有个术语，叫哈希消息认证码（HMAC）。
 
-![img](./http1.assets/hmac.png)
+<img src="./http1.assets/hmac.png" alt="img" style="zoom: 33%;" />
 
 
 
@@ -757,7 +748,7 @@ TLS把对称加密和非对称加密结合起来，两者互相取长补短，�
 
 签名和公钥一样完全公开，任何人都可以获取。但这个签名只有用私钥对应的公钥才能解开，拿到摘要后，再比对原文验证完整性，就可以像签署文件一样证明消息确实是你发的。
 
-![img](./http1.assets/iiiiiii.png)
+<img src="./http1.assets/iiiiiii.png" alt="img" style="zoom: 33%;" />
 
 刚才的这两个行为也有专用术语，叫做“签名”和“验签”。
 
@@ -781,7 +772,7 @@ DV 是最低的，只是域名级别的可信，背后是谁不知道。EV 是�
 
 这还是信任链的问题。小一点的 CA 可以让大 CA 签名认证，但链条的最后，也就是Root CA，就只能自己证明自己了，这个就叫“自签名证书”（Self-Signed Certificate）或者“根证书”（Root Certificate）。你必须相信，否则整个证书信任链就走不下去了。
 
-![img](./http1.assets/ca.png)
+<img src="./http1.assets/ca.png" alt="img" style="zoom: 33%;" />
 
 有了这个证书体系，操作系统和浏览器都内置了各大 CA 的根证书，上网的时候只要服务器发过来它的证书，就可以验证证书里的签名，顺着证书链（Certificate Chain）一层层地验证，直到找到根证书，就能够确定证书是可信的，从而里面的公钥也是可信的。
 
@@ -795,4 +786,4 @@ DV 是最低的，只是域名级别的可信，背后是谁不知道。EV 是�
 
 下面的这张图简要地描述了 TLS 的握手过程，其中每一个“框”都是一个记录，多个记录组合成一个 TCP 包发送。所以，最多经过两次消息往返（4 个消息）就可以完成握手，然后就可以在安全的通信环境里发送 HTTP 报文，实现 HTTPS 协议。
 
-![img](./http1.assets/1111111111111111.png)
+<img src="./http1.assets/1111111111111111.png" alt="img" style="zoom:33%;" />

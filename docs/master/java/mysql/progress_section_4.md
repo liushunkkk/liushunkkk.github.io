@@ -98,7 +98,7 @@
   SELECT ... FOR SHARE; #(8.0新增语法)
   ```
 
-  在普通的SELECT语句后边加`LOCK IN SHARE NODE`，如果当前事务执行了该语句，那么它会为读取到的记录加s锁，这样允许别的事务继续获取这些记录的S锁(比方说别的事务也使用`SELECT ... LOCK IN SHAREMODE`语句来读取这些记录)，但是不能获取这些记录的X锁(比如使用`SELECT ... FOR UPDATE`语句来读取这些记录，或者直接修改这些记录)。如果别的事务想要获取这些记录的X锁，那么它们会阻塞，直到当前事务提交之后将这些记录上的`S锁` 释放掉。
+  在普通的SELECT语句后边加`LOCK IN SHARE NODE`，如果当前事务执行了该语句，那么它会为读取到的记录加s锁，这样允许别的事务继续获取这些记录的S锁(比方说别的事务也使用`SELECT ... LOCK IN SHARE MODE`语句来读取这些记录)，但是不能获取这些记录的X锁(比如使用`SELECT ... FOR UPDATE`语句来读取这些记录，或者直接修改这些记录)。如果别的事务想要获取这些记录的X锁，那么它们会阻塞，直到当前事务提交之后将这些记录上的`S锁` 释放掉。
 
 - 对读取的记录加`X锁`：
 
@@ -481,7 +481,7 @@ mysql> show status like 'innodb_row_lock%';
 
 （2）查询锁等待情况
 
-`SELECT * FROM performance_schema.data_locks.data_lock_waits\G`
+`SELECT * FROM performance_schema.data_lock_waits\G`
 
 （3）查询锁的情况
 

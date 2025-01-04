@@ -1104,7 +1104,7 @@ show profile cpu,block io for query 2
 - ③ CONTEXT SWITCHES：上下文切换开销。
 - ④ CPU：显示CPU开销信息。
 - ⑤ IPC：显示发送和接收开销信息。
-- ⑥ MEMORY：显示内存开销信 息。
+- ⑥ MEMORY：显示内存开销信息。
 - ⑦ PAGE FAULTS：显示页面错误开销信息。
 - ⑧ SOURCE：显示和Source_function，Source_file， Source_line相关的开销信息。
 - ⑨ SWAPS：显示交换次数开销信息。
